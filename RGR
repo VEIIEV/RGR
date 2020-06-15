@@ -1,11 +1,11 @@
 #include <iostream>
-#include <stdlib.h>
-#include <iomanip>
+#include <fstream>
 #define SIZE 6
 
 using namespace std;
 int main()
 {
+  
     std::cout.setf(ios::fixed);
     int finish = 0;
     int begin_index = 0;
@@ -23,29 +23,34 @@ int main()
     float itog[SIZE][SIZE];
     int svyaz[SIZE][SIZE];
     float trafic[SIZE][SIZE];
-    int minimum[SIZE];
+    float minimum[SIZE];
     int posewenie[SIZE];
     float temp=0;
     int minindex;
     int min;
-    for (int i = 0; i < SIZE; i++)
+    int buff;
+    ifstream fin("file.txt", ios_base::in);
+    if (!fin.is_open())
     {
-        svyaz[i][i] = 0;
-        for (int j = i + 1; j < SIZE; j++) {
-            std::cout << "Vvedite rasstoyanie ot " << i + 1 << " goroda do - " << j + 1 << " goroda: " << std::endl;
-            std::cin >> temp;
-            svyaz[i][j] = temp;
-            svyaz[j][i] = temp;
-            temp = -1;
-            while (( temp> 1) || (temp < 0))
+        cout << "Файл не может быть открыт!\n"; 
+        return 1;
+    }
+    else
+    {
+        for (int i = 0; i < SIZE; i++)
+        {
+            itog[i][i] = 0;
+            for (int j = i + 1; j < SIZE; j++)
             {
-                std::cout << "Vvedite nagryzky dannoi dorogi ot 0.0 do 1.0" << std::endl;
-                std::cin >> temp;
+                fin >> temp;
+                svyaz[i][j] = temp;
+                svyaz[j][i] = temp;
+                temp = -1;
+                while ((temp > 1) || (temp < 0)) fin >> temp;
+                trafic[i][j] = temp;
+                trafic[j][i] = temp;
+                itog[i][j] = svyaz[i][j] - svyaz[i][j] * trafic[i][j]; itog[j][i] = svyaz[j][i] - svyaz[j][i] * trafic[j][i];
             }
-            trafic[i][j] = temp;
-            trafic[j][i] = temp;
-            itog[i][j] = svyaz[i][j] - svyaz[i][j] * trafic[i][j]; itog[j][i] = svyaz[j][i] - svyaz[j][i] * trafic[j][i]; 
-
         }
     }
     for (int i = 0; i < SIZE; i++)
@@ -80,6 +85,7 @@ int main()
                     temp = min + itog[minindex][i];
                     if (temp < minimum[i])
                     {
+                        cout << itog[minindex][i] << " ";
                         minimum[i] = temp;
                     }
                 }
@@ -88,10 +94,10 @@ int main()
         }
     } while (minindex < 10000);
 
-     std::cout << "\nKratchaishee rastoyanie do goroda:" << std::endl;
+     std::cout << "\n optimal'nyj marshrut sostavit :";
      std::cout << minimum[finish-1]<< std::endl;
 
-     int ver[SIZE];
+     float ver[SIZE];
        int end = finish-1;
        ver[0] = end + 1;
        int k = 1;
@@ -113,8 +119,7 @@ int main()
                }
        }
        cout << "\nVivod kratchaishego puti\n";
-       cout << ver[begin_index-1] << ">>";
        for (int i = k - 1; i >= 0; i--)
-           cout << ver[i] << ">>";
+           cout  << ver[i]<< " ";
     return 0;
 }
